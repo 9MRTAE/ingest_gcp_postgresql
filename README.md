@@ -1,4 +1,4 @@
-# ingest_gcp_postgresql_ecoapp
+# ingest_gcp_postgresql
 
 Ingest pipeline — **GCP · PostgreSQL · `your-db-hostname` · microservices (18 databases)**
 
