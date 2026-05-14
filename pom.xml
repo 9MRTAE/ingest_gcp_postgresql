@@ -1,0 +1,45 @@
+                <project xmlns="http://maven.apache.org/POM/4.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                <modelVersion>4.0.0</modelVersion>
+
+                <groupId>com.example</groupId>
+                <artifactId>authentication</artifactId>
+                <version>1.0.0</version>
+                <packaging>jar</packaging>
+
+                <properties>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+                    <jvm.args.gc.log.path>-Xloggc:logs/gc.log</jvm.args.gc.log.path>
+                    <jvm.args.print.heap.at.gc>-XX:+PrintHeapAtGC</jvm.args.print.heap.at.gc>
+                    <jvm.args.print.gc.details>-XX:+PrintGCDetails</jvm.args.print.gc.details>
+                    <jvm.args.print.gc.date.stamps>-XX:+PrintGCDateStamps</jvm.args.print.gc.date.stamps>
+                    <jvm.args.gc.log.file.rotation>-XX:+UseGCLogFileRotation</jvm.args.gc.log.file.rotation>
+                    <jvm.args.number.of.gc.log.files>-XX:NumberOfGCLogFiles=5</jvm.args.number.of.gc.log.files>
+                    <jvm.args.gc.log.file.size>-XX:GCLogFileSize=10M</jvm.args.gc.log.file.size>
+                </properties>
+
+                <dependencies>
+                    <!-- Add your dependencies here -->
+                </dependencies>
+
+                <build>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>3.8.1</version>
+                            <configuration>
+                                <source>${maven.compiler.source}</source>
+                                <target>${maven.compiler.target}</target>
+                            </configuration>
+                        </plugin>
+
+                        <plugin>
+                            <groupId>org.sonarsource.scanner.maven</groupId>
+                            <artifactId>sonar-maven-plugin</artifactId>
+                            <version>3.9.1.2184</version>
+                        </plugin>
+                    </plugins>
+                </build>
+            </project>

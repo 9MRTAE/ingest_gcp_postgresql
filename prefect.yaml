@@ -1,0 +1,370 @@
+name: ingest_gcp_postgresql_ecoapp
+ 
+prefect-version: "3"
+ 
+build: []
+push: []
+ 
+pull:
+  - prefect.deployments.steps.set_working_directory:
+      directory: /app
+ 
+# ── Deployments ───────────────────────────────────────────────────────────────
+# 1 deployment per db_name (flow file)
+# Naming: ingest_{platform}_{db_type}_{db_name}
+#
+# SA credentials: ดึงจาก GCP Secret Manager ผ่าน get_service_account_credentials()
+# ใน config/__init__.py — ไม่ต้อง mount key file หรือตั้ง GOOGLE_APPLICATION_CREDENTIALS
+#
+# Secret Manager client ใช้ ADC (Application Default Credentials) ของ worker node
+# วิธี auth ที่รองรับ (เลือกอย่างใดอย่างหนึ่ง):
+#   1. Workload Identity บน GKE  → ไม่ต้องทำอะไรเพิ่ม
+#   2. docker-pool บน VM          → ตั้ง GOOGLE_APPLICATION_CREDENTIALS บน host แล้ว
+#                                    passthrough ผ่าน env ของ work pool แทนต่อ container
+#
+# Repair single table via CLI:
+#   prefect deployment run \
+#     'ingest_gcp_postgresql_announcement_announcement_api_prd/ingest_gcp_postgresql_announcement_announcement_api_prd' \
+#     -p TABLE_NAME=post -p JOB_BACKDATE_DEPEN=-3
+ 
+deployments:
+ 
+  # ── announcement_announcement_api_prd ───────────────────────────────────────
+  - name: ingest_gcp_postgresql_announcement_announcement_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_announcement_announcement_api_prd.py:ingest_gcp_postgresql_announcement_announcement_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── apollo_api_prd ──────────────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_apollo_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_apollo_api_prd.py:ingest_gcp_postgresql_apollo_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── b2b_auth_api_prd ────────────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_b2b_auth_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_b2b_auth_api_prd.py:ingest_gcp_postgresql_b2b_auth_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── contract_api_prd ────────────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_contract_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_contract_api_prd.py:ingest_gcp_postgresql_contract_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── contract_api_prd_enumdata ───────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_contract_api_prd_enumdata
+    entrypoint: flows/ingest_gcp_postgresql_contract_api_prd_enumdata.py:ingest_gcp_postgresql_contract_api_prd_enumdata
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      git_repo_url: ""
+      git_branch: "main"
+    schedules: []
+ 
+  # ── facility_management_api_prd ─────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_facility_management_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_facility_management_api_prd.py:ingest_gcp_postgresql_facility_management_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── iam_iam_api_prd ─────────────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_iam_iam_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_iam_iam_api_prd.py:ingest_gcp_postgresql_iam_iam_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── ivote_ivote_api_prd ─────────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_ivote_ivote_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_ivote_ivote_api_prd.py:ingest_gcp_postgresql_ivote_ivote_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── lastmile_api_prd ────────────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_lastmile_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_lastmile_api_prd.py:ingest_gcp_postgresql_lastmile_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── learning_center_api_prd ─────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_learning_center_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_learning_center_api_prd.py:ingest_gcp_postgresql_learning_center_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── notification_mkt_noti_api_prd ───────────────────────────────────────────
+  - name: ingest_gcp_postgresql_notification_mkt_noti_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_notification_mkt_noti_api_prd.py:ingest_gcp_postgresql_notification_mkt_noti_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── notification_notification_api_prd ───────────────────────────────────────
+  - name: ingest_gcp_postgresql_notification_notification_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_notification_notification_api_prd.py:ingest_gcp_postgresql_notification_notification_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── payment_payment_api_prd ─────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_payment_payment_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_payment_payment_api_prd.py:ingest_gcp_postgresql_payment_payment_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── payment_payment_public_api_prd ──────────────────────────────────────────
+  - name: ingest_gcp_postgresql_payment_payment_public_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_payment_payment_public_api_prd.py:ingest_gcp_postgresql_payment_payment_public_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── pdpa_api_prd ────────────────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_pdpa_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_pdpa_api_prd.py:ingest_gcp_postgresql_pdpa_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── role_api_prd ────────────────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_role_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_role_api_prd.py:ingest_gcp_postgresql_role_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── subscription_api_prd ────────────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_subscription_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_subscription_api_prd.py:ingest_gcp_postgresql_subscription_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []
+ 
+  # ── urb_mapping_mapping_api_prd ─────────────────────────────────────────────
+  - name: ingest_gcp_postgresql_urb_mapping_mapping_api_prd
+    entrypoint: flows/ingest_gcp_postgresql_urb_mapping_mapping_api_prd.py:ingest_gcp_postgresql_urb_mapping_mapping_api_prd
+    work_pool:
+      name: "{{ $PREFECT_WORK_POOL }}"
+      work_queue_name: "{{ $PREFECT_WORK_QUEUE }}"
+      job_variables:
+        image: "{{ $IMAGE_TAG }}"
+        env:
+          CI_COMMIT_BRANCH: "{{ $CI_COMMIT_BRANCH }}"
+          IMAGE_TAG: "{{ $IMAGE_TAG }}"
+          SECRET_PROJECT_ID: "{{ $SECRET_PROJECT_ID }}"
+    parameters:
+      TABLE_NAME: ""
+      JOB_BACKDATE_DEPEN: "-1"
+      JOB_STARTDATE_DEPEN: ""
+      JOB_ENDDATE_DEPEN: ""
+    schedules: []

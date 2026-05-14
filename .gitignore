@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+ 
+# Mac
+.DS_Store
+__MACOSX
+ 
+# Env
+.env
+.env.*
+ 
+# Virtualenv
+venv/
+.venv/
+env/
+ 
+# IDE
+.vscode/
+.idea/
+ 
+# Prefect
+.prefect/
+ 
+# Jupyter
+.ipynb_checkpoints/
+ 
+# Logs
+*.log
+ 
+# Build
+dist/
+build/
+ 
+# OS
+Thumbs.db
+ 
+# Docker
+.docker/
+ 
+# Local config
+config/local.py
+ 
+# Secret
+*.json
+service_account.json
+ 
+# Test output
+coverage/
+htmlcov/
+ 
+# Temporary
+tmp/
+temp/
